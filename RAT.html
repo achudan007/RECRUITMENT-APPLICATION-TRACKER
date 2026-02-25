@@ -1,34 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>RAT - Python Edition</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAT - Advanced Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <h1>RAT (Recruitment Tracker)</h1>
-    
-    <form action="/add" method="post">
-        <input name="company" placeholder="Company" required>
-        <input name="role" placeholder="Role" required>
-        <select name="status">
-            <option value="applied">Applied</option>
-            <option value="interviewing">Interviewing</option>
-        </select>
-        <button type="submit">Add</button>
-    </form>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-8">
 
-    <hr>
+    <div class="max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-10">
+            <h1 class="text-3xl font-bold text-blue-400">
+                <i class="fas fa-mouse-pointer mr-2"></i>RAT <span class="text-gray-400 font-light">| Recruitment Tracker</span>
+            </h1>
+            <div class="flex gap-4">
+                <div class="bg-gray-800 p-3 rounded-lg border border-gray-700">
+                    <p class="text-xs text-gray-400 uppercase">Total Apps</p>
+                    <p class="text-xl font-bold">{{ apps|length }}</p>
+                </div>
+            </div>
+        </header>
 
-    <table>
-        <tr><th>Company</th><th>Role</th><th>Status</th><th>Action</th></tr>
-        {% for app in apps %}
-        <tr>
-            <td>{{ app.company }}</td>
-            <td>{{ app.role }}</td>
-            <td><strong>{{ app.status }}</strong></td>
-            <td><a href="/delete/{{ loop.index0 }}">Delete</a></td>
-        </tr>
-        {% endfor %}
-    </table>
+        <section class="bg-gray-800 p-6 rounded-xl border border-gray-700 mb-10 shadow-xl">
+            <form action="/add" method="post" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="relative">
+                    <i class="fas fa-building absolute left-3 top-4 text-gray-500"></i>
+                    <input name="company" placeholder="Company Name" required 
+                           class="w-full bg-gray-900 border border-gray-700 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="relative">
+                    <i class="fas fa-briefcase absolute left-3 top-4 text-gray-500"></i>
+                    <input name="role" placeholder="Job Role" required 
+                           class="w-full bg-gray-900 border border-gray-700 rounded-lg py-3 pl-10 pr-4 focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="relative">
+                    <i class="fas fa-tasks absolute left-3 top-4 text-gray-500"></i>
+                    <select name="status" class="w-full bg-gray-900 border border-gray-700 rounded-lg py-3 pl-10 pr-4 appearance-none focus:outline-none focus:border-blue-500">
+                        <option value="applied">Applied</option>
+                        <option value="interviewing">Interviewing</option>
+                        <option value="offered">Offered</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Add Application
+                </button>
+            </form>
+        </section>
+
+        <div class="overflow-hidden rounded-xl border border-gray-700 bg-gray-800">
+            <table class="w-full text-left">
+                <thead class="bg-gray-700 text-gray-300">
+                    <tr>
+                        <th class="p-4">Company</th>
+                        <th class="p-4">Role</th>
+                        <th class="p-4">Status</th>
+                        <th class="p-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    {% for app in apps %}
+                    <tr class="hover:bg-gray-750 transition-colors">
+                        <td class="p-4 font-semibold text-white">{{ app.company }}</td>
+                        <td class="p-4 text-gray-400">{{ app.role }}</td>
+                        <td class="p-4">
+                            {% if app.status == 'applied' %}
+                                <span class="px-3 py-1 rounded-full text-xs bg-blue-900 text-blue-300">Applied</span>
+                            {% elif app.status == 'interviewing' %}
+                                <span class="px-3 py-1 rounded-full text-xs bg-yellow-900 text-yellow-300">Interviewing</span>
+                            {% elif app.status == 'offered' %}
+                                <span class="px-3 py-1 rounded-full text-xs bg-green-900 text-green-300">Offered</span>
+                            {% else %}
+                                <span class="px-3 py-1 rounded-full text-xs bg-red-900 text-red-300">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4 text-right">
+                            <a href="/delete/{{ loop.index0 }}" class="text-red-400 hover:text-red-300 transition-colors">
+                                <i class="fas fa-trash-can"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not apps %}
+            <div class="p-10 text-center text-gray-500">
+                <i class="fas fa-folder-open text-4xl mb-3"></i>
+                <p>No applications tracked yet. Start applying!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
 </body>
 </html>

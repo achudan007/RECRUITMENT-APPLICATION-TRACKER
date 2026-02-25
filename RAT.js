@@ -1,44 +1,54 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('app-form');
-    let applications = JSON.parse(localStorage.getItem('rat_apps')) || [];
+// 1. Select DOM elements
+const form = document.getElementById('app-form');
+const dashboard = document.getElementById('dashboard');
 
-    const render = () => {
-        // Clear columns
-        document.querySelectorAll('.list').forEach(list => list.innerHTML = '');
+// 2. Load data from LocalStorage safely
+let apps = JSON.parse(localStorage.getItem('rat_data')) || [];
 
-        applications.forEach((app, index) => {
-            const card = document.createElement('div');
-            card.className = `card ${app.status}`;
-            card.innerHTML = `
-                <h3>${app.company}</h3>
-                <p>${app.role}</p>
-                <button onclick="deleteApp(${index})">Delete</button>
-            `;
-            
-            const targetCol = document.querySelector(`#${app.status}-col .list`);
-            if (targetCol) targetCol.appendChild(card);
-        });
-        
-        localStorage.setItem('rat_apps', JSON.stringify(applications));
-    };
+// 3. Function to save and refresh UI
+const updateUI = () => {
+    localStorage.setItem('rat_data', JSON.stringify(apps));
+    renderCards();
+};
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const newApp = {
-            company: document.getElementById('company').value,
-            role: document.getElementById('role').value,
-            status: document.getElementById('status').value,
-            date: new Date().toLocaleDateString()
-        };
-        applications.push(newApp);
-        form.reset();
-        render();
+// 4. Function to build the HTML cards
+const renderCards = () => {
+    // Clear current lists
+    document.querySelectorAll('.list').forEach(list => list.innerHTML = '');
+
+    apps.forEach((app, index) => {
+        const listContainer = document.querySelector(`#${app.status}-col .list`);
+        if (!listContainer) return; // Safety check
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <strong>${app.company}</strong><br>
+            <small>${app.role}</small><br>
+            <button onclick="deleteApp(${index})" style="color:red; border:none; background:none; cursor:pointer;">× Remove</button>
+        `;
+        listContainer.appendChild(card);
     });
+};
 
-    window.deleteApp = (index) => {
-        applications.splice(index, 1);
-        render();
+// 5. Add new application
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const newApp = {
+        company: document.getElementById('company').value,
+        role: document.getElementById('role').value,
+        status: document.getElementById('status').value
     };
-
-    render(); // Initial load
+    apps.push(newApp);
+    form.reset();
+    updateUI();
 });
+
+// 6. Delete application (Global function for the button)
+window.deleteApp = (index) => {
+    apps.splice(index, 1);
+    updateUI();
+};
+
+// Initial Render
+renderCards();
